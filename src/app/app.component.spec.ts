@@ -1,35 +1,48 @@
-import { TestBed, async } from '@angular/core/testing';
-import { RouterTestingModule } from '@angular/router/testing';
-import { AppComponent } from './app.component';
+import {Location} from "@angular/common";
+import {TestBed, fakeAsync, tick} from '@angular/core/testing';
+import {RouterTestingModule} from "@angular/router/testing";
+import {Router, Routes} from "@angular/router";
 
-describe('AppComponent', () => {
-  beforeEach(async(() => {
+import {DashboardComponent} from './dashboard/dashboard.component';
+import {View1Component} from './view1/view1.component';
+import {AppComponent} from './app.component';
+
+describe('Router:app', () => {
+  let location: Location;
+  let router: Router;
+  let fixture;
+
+  const routes: Routes = [
+    { path: 'dashboard', component: DashboardComponent },
+    { path: 'view/:id',      component: View1Component },
+  ];
+
+  beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [
-        RouterTestingModule
-      ],
+      imports: [    RouterTestingModule.withRoutes(routes)],
       declarations: [
+        DashboardComponent,
+        View1Component,
         AppComponent
-      ],
-    }).compileComponents();
+      ]
+    });
+
+    router = TestBed.get(Router);
+    location = TestBed.get(Location);
+
+    fixture = TestBed.createComponent(AppComponent);
+    router.initialNavigation();
+  });
+
+  it('navigate to "dashboard" redirects you to /dashboard', fakeAsync(() => {
+    router.navigate(['/dashboard']);
+    tick(50);
+    expect(location.path()).toBe('/dashboard');
   }));
 
-  it('should create the app', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.debugElement.componentInstance;
-    expect(app).toBeTruthy();
-  });
-
-  it(`should have as title 'demo132'`, () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.debugElement.componentInstance;
-    expect(app.title).toEqual('demo132');
-  });
-
-  it('should render title in a h1 tag', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    fixture.detectChanges();
-    const compiled = fixture.debugElement.nativeElement;
-    expect(compiled.querySelector('h1').textContent).toContain('Welcome to demo132!');
-  });
+  it('navigate to "view/1" redirects you to /view/1', fakeAsync(() => {
+    router.navigate(['/view/1']);
+    tick(50);
+    expect(location.path()).toBe('/view/1');
+  }));
 });
